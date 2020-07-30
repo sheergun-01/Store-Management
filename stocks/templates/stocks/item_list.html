@@ -1,0 +1,59 @@
+{% extends 'stocks/base.html' %}
+{% load crispy_forms_tags %}
+{% if messages %}
+<ul class="messages">
+       {% for message in messages %}
+             <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+       {% endfor %}
+</ul>
+{% endif %}
+{% block title %}
+<h2 class="header">List of Items</h2>
+{% endblock %}
+{% block content %}
+<form action="" method="post">
+    {% csrf_token %}
+    {{form|crispy}}
+    <button type="submit">Search</button>
+</form>
+<br>
+<div class="display-table">
+    <table class='table'>
+        <thead>
+          <tr>
+            <th>COUNT</th>
+            <th>CATEGORY</th>
+            <th>PRODUCT NAME</th>
+            <th>QUANTITY</th>
+            <th>REORDER LEVEL</th>
+            <th>TIMESTAMP</th>
+            <th>LAST UPDATED</th>
+            <th>DELETE</th>
+          </tr>
+        </thead>
+    {% for instance in stock %}
+        <tr>
+            <td>{{forloop.counter}}</td>
+            <td>{{instance.category}}</td>
+            <td><a href="{% url 'stocks:update_item' instance.id %}">{{instance.product_name}}</a></td>
+            <td>
+                {% if instance.quantity <= instance.reorder_level %}
+                <div style="background-color: orange;">
+                    <a href="{% url 'stocks:stock_detail' instance.id %}">{{instance.quantity}}</a>
+                </div>
+                {% else %}
+                    <a href="{% url 'stocks:stock_detail' instance.id %}">{{instance.quantity}}</a>
+                {% endif %}
+            </td>
+            <td><a href="{% url 'stocks:reorder_level' instance.id %}">{{instance.reorder_level}}</a></td>
+            <td>{{instance.timestamp}}</td>
+            <td>{{instance.last_updated}}</td>
+            <td><a href="{% url 'stocks:delete_item' instance.id %}">delete</a> </td>
+        </tr>
+    {% endfor %}
+    </table>
+    {% endblock %}
+</div>
+
+
+
